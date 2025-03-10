@@ -1,5 +1,6 @@
 # Cub3D Project 
 This project is a simple 3D game inspired by **Wolfenstein 3D**, created using the C language and the **minilibx** library. The game features basic 3D rendering with raycasting, textures, map parsing, and player movement.
+![Uploading Screenshot 2025-03-10 154202.png…]()
 
 ## Known Bugs and Issues
 

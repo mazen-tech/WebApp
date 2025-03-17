@@ -1,0 +1,138 @@
+{% extends "blog/base.html" %}
+{% block content %}
+<style>
+    /* Page Styling */
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .card {
+        transition: box-shadow 0.3s ease-in-out;
+        border: none;
+    }
+
+    .card:hover {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .rounded-circle {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+    }
+
+    .text-primary {
+        font-weight: 600;
+        color: #0366d6; /* GitHub's primary blue */
+        text-decoration: none;
+    }
+
+    .text-primary:hover {
+        text-decoration: underline;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    h1 {
+        font-size: 2rem;
+        color: #24292e; /* GitHub's dark text color */
+    }
+
+    .pagination .page-link {
+        color: #0366d6;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #0366d6;
+        border-color: #0366d6;
+        color: white;
+    }
+
+    .pagination .page-item .page-link {
+        border: none;
+        border-radius: 50px;
+    }
+
+    .media-body .article-title {
+        font-size: 1.25rem;
+        color: #0366d6;
+    }
+
+    .media-body .article-title:hover {
+        text-decoration: underline;
+    }
+
+    .btn-outline-info {
+        border-color: #0366d6;
+        color: #0366d6;
+    }
+
+    .btn-outline-info:hover {
+        background-color: #0366d6;
+        color: white;
+    }
+</style>
+
+<div class="container mt-5">
+    <h1 class="mb-4 text-center text-dark font-weight-bold">
+        Posts by {{ view.kwargs.username }} 
+        <span class="text-muted font-weight-light">({{ page_obj.paginator.count }})</span>
+    </h1>
+
+    {% for post in posts %}
+    <article class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+                <img class="rounded-circle" src="{{ post.author.profile.image.url }}" alt="{{ post.author }}">
+                <div class="ml-3">
+                    <a href="{% url 'user-posts' post.author.username %}" class="text-dark font-weight-bold">{{ post.author }}</a>
+                    <small class="text-muted d-block">{{ post.date_posted|date:"F d, Y" }}</small>
+                </div>
+            </div>
+            <h2 class="card-title">
+                <a href="{% url 'post-detail' post.id %}" class="text-primary">{{ post.title }}</a>
+            </h2>
+            <p class="card-text text-muted">{{ post.content|truncatewords:25 }}</p>
+        </div>
+    </article>
+    {% empty %}
+    <p class="text-center text-muted">No posts found.</p>
+    {% endfor %}
+
+    {% if is_paginated %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock content %}

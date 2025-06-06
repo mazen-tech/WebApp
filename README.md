@@ -52,7 +52,7 @@ For Windows users, install **WSL** and set up a Linux distribution (Ubuntu recom
 ```bash
 wsl --install
 
-python3 --version  # Check if Python is installed
+python3 --version  # Check if Python is installed on your local machine
 sudo apt update && sudo apt install python3 -y  # Install Python 3 if missing
 
 

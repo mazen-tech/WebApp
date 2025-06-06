@@ -29,7 +29,7 @@
 
 ## 🚀 Tech Stack & Dependencies  
 
-To run this application successfully, ensure you have the following stack installed on your system:  
+To run this application successfully, ensure that you have the following stack installed on your system:  
 
 ### **🖥️ Environment**  
 - **WSL (Windows Subsystem for Linux) or a Linux-based OS**  

@@ -1,3 +1,6 @@
+/* main.css */
+
+/* Default Styles */
 body {
   background: #fafafa;
   color: #333333;
@@ -58,7 +61,7 @@ a.article-title:hover {
 .article-metadata {
   padding-bottom: 1px;
   margin-bottom: 4px;
-  border-bottom: 1px solid #e3e3e3
+  border-bottom: 1px solid #e3e3e3;
 }
 
 .article-metadata a:hover {
@@ -81,4 +84,50 @@ a.article-title:hover {
 
 .account-heading {
   font-size: 2.5rem;
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+  background-color: #181818;
+  color: #ffffff;
+}
+
+body.dark-mode .navbar {
+  background-color: #222;
+}
+
+body.dark-mode .navbar-light .navbar-nav .nav-link {
+  color: #ffffff;
+}
+
+body.dark-mode .content-section {
+  background-color: #333;
+  border: 1px solid #444;
+}
+
+body.dark-mode .article-title {
+  color: #ffffff;
+}
+
+body.dark-mode a.article-title:hover {
+  color: #428bca;
+}
+
+body.dark-mode .account-heading {
+  color: #ffffff;
+}
+
+body.dark-mode .btn-outline-light {
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+body.dark-mode .btn-outline-light:hover {
+  background-color: #444;
+  border-color: #444;
+}
+
+/* Additional Styling for Dark Mode Elements */
+body.dark-mode .site-header .navbar-nav .nav-link {
+  color: #ffffff;
 }

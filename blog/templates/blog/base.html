@@ -8,12 +8,21 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'blog/main.css' %}">
+    <link rel="stylesheet" href="{% static 'blog/dark_mode.css' %}">
+    <link rel="stylesheet" href="{% static 'blog/notifications.css' %}">
+    <link rel="icon" href="{% static 'blog/logo.png' %}" type="image/png">
+
+
+
     {% if title %}
         <title>Django WebApp - {{ title }}</title>
     {% else %}
         <title>Django WebApp</title>
     {% endif %}
+
     <style>
       /* Hero Section Styling */
       .hero {
@@ -43,52 +52,48 @@
         font-size: 1.2rem;
         line-height: 1.5;
         font-family: 'Arial', sans-serif;
-        white-space: pre-wrap; /* Keeps line breaks */
-        border-right: 2px solid white; /* Simulates a cursor */
+        white-space: pre-wrap;
+        border-right: 2px solid white;
         animation: blink-cursor 0.5s step-end infinite;
       }
-
       @keyframes blink-cursor {
-        from {
-          border-right-color: white;
-        }
-        to {
-          border-right-color: transparent;
-        }
+        from { border-right-color: white; }
+        to { border-right-color: transparent; }
       }
     </style>
   </head>
+
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand font-weight-bold" href="{% url 'blog-home' %}">
-            Innowise Interview
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <a class="navbar-brand font-weight-bold" href="{% url 'blog-home' %}">Mazen</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-              <li class="nav-item">
-                  <a class="nav-link" href="{% url 'blog-home' %}">Home</a>
-              </li>
-          </ul>
-          <form id="searchform" action="{% url 'search' %}" method="get" class="form-inline">
-              <input class="form-control mr-sm-2" type="search" name="q" placeholder="Search" aria-label="Search">
-              <button class="btn btn-outline-light" type="submit">Search</button>
-          </form>
-          {% if user.is_authenticated %}
-              <a href="{% url 'user-posts' user %}" class="btn btn-outline-light m-2">My Posts</a>
-              <a href="{% url 'post-create' %}" class="btn btn-outline-light m-2">New Post</a>
-              <a href="{% url 'profile' %}" class="btn btn-outline-light m-2">{{ user.username }}</a>
-              <a href="{% url 'logout' %}" class="btn btn-outline-light m-2">Log Out</a>
-          {% else %}
-              <a href="{% url 'login' %}" class="btn btn-outline-light m-2">Log In</a>
-              <a href="{% url 'register' %}" class="btn btn-outline-light m-2">Sign Up</a>
-          {% endif %}
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'blog-home' %}">Home</a>
+                </li>
+            </ul>
+            <form id="searchform" action="{% url 'search' %}" method="get" class="form-inline">
+                <input class="form-control mr-sm-2" type="search" name="q" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-light" type="submit">Search</button>
+            </form>
+            {% if user.is_authenticated %}
+                <a href="{% url 'user-posts' user %}" class="btn btn-outline-light m-2">My Posts</a>
+                <a href="{% url 'post-create' %}" class="btn btn-outline-light m-2">New Post</a>
+                <a href="{% url 'profile' %}" class="btn btn-outline-light m-2">{{ user.username }}</a>
+                <a href="{% url 'logout' %}" class="btn btn-outline-light m-2">Log Out</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline-light m-2">Log In</a>
+                <a href="{% url 'register' %}" class="btn btn-outline-light m-2">Sign Up</a>
+            {% endif %}
+            <!-- Dark Mode Toggle Button -->
+            <button id="darkModeToggle" class="btn btn-outline-light m-2">🌙</button>
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <div class="hero">
         <div class="line-art"></div>
         <div class="hero-content">
@@ -109,27 +114,37 @@
         {% endblock %}
     </div>
 
-    <!-- Optional JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <!-- Notification Button and Popup -->
+    <div id="notification-container">
+      <div id="notification-popup">
+          <p>This is your notification!</p>
+      </div>
+      <button id="notification-btn" class="chat-btn">💬</button>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+
+    <!-- Main JavaScript -->
     <script src="{% static 'blog/main.js' %}"></script>
-    
+    <script src="{% static 'blog/dark_mode_toggler.js' %}"></script>
+    <script src="{% static 'blog/notifications.js' %}"></script>
+
+    <!-- Typing Animation Script -->
     <script>
-      const text = `Hello 😊, my name is Mazen. Today, I'm excited to be interviewing with Innowise!  
-To make the experience more engaging and showcase my skills, I created this small WebApp using Django. This project not only demonstrates my technical expertise but also provides something interactive that you can see and explore.`;
-
-      let index = 0;
-
-      function typeWriter() {
-          if (index < text.length) {
-              document.getElementById("animated-text").innerHTML += text.charAt(index);
-              index++;
-              setTimeout(typeWriter, 50); // Adjust typing speed by changing the value
+      document.addEventListener("DOMContentLoaded", function () {
+          const text = "Hello 😊, we are group 4. Today, We're excited to be presenting our project for Practice!";
+          let index = 0;
+          const animatedText = document.getElementById("animated-text");
+          function typeWriter() {
+              if (index < text.length) {
+                  animatedText.textContent += text.charAt(index);
+                  index++;
+                  setTimeout(typeWriter, 50);
+              }
           }
-      }
-
-      window.onload = typeWriter; // Start animation when the page loads
+          typeWriter();
+      });
     </script>
   </body>
 </html>

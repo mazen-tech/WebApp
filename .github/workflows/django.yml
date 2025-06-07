@@ -2,12 +2,14 @@ name: Django CI
 
 on:
   push:
-    branches: [ "**" ]
+    branches:
+      - '**'
   pull_request:
-    branches: [ "**" ]
+    branches:
+      - '**'
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     services:
@@ -17,15 +19,24 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: test_db
-        ports: ['5432:5432']
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
+    env:
+      DJANGO_SETTINGS_MODULE: .settings
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test_db
+      DB_HOST: localhost
+      DB_PORT: 5432
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -38,13 +49,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h localhost -p 5432; do
+            echo "Waiting for PostgreSQL..."
+            sleep 1
+          done
+
       - name: Run Django migrations
         run: python manage.py migrate
 
       - name: Run tests
         run: python manage.py test
 
-      - name: Run linter (optional)
+      - name: Run flake8 linter
         run: |
           pip install flake8
           flake8 .
+

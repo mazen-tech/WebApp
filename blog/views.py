@@ -136,3 +136,14 @@ def like_post(request, pk):
         else:
             post.likes.add(request.user)
     return redirect(f"/post/{pk}/#like")
+
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+
+@login_required
+@require_POST
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
+    post_pk = comment.post.pk
+    comment.delete()
+    return redirect(f'/post/{pk}/?liked=true')

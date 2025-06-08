@@ -44,4 +44,67 @@
       <p class="article-content">{{ object.content }}</p>
     </div>
   </article>
+
+<hr>
+
+<!-- Like Button -->
+<div id="like">
+  <form method="post" action="{% url 'like-post' object.pk %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-outline-danger">
+      {% if is_liked %}
+        ❤️ Unlike
+      {% else %}
+        🤍 Like
+      {% endif %}
+      ({{ object.likes.count }})
+    </button>
+  </form>
+</div>
+
+<!-- Comments Section -->
+<hr>
+<h4 id="comments">Comments</h4>
+{% for comment in comments %}
+  <div class="card mb-2">
+    <div class="card-body">
+      <p><strong>{{ comment.author }}</strong>: {{ comment.content }}</p>
+      <small class="text-muted">{{ comment.created_at }}</small>
+      {% if comment.author == user %}
+        <form method="post" action="{% url 'delete-comment' comment.id %}" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+          {% csrf_token %}
+          <button type="submit" style="border: none; background: none; padding: 0;" title="Delete">
+            <i class="fas fa-trash text-danger"></i>
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+{% empty %}
+  <p>No comments yet.</p>
+{% endfor %}
+
+<!-- Add Comment Form -->
+{% if user.is_authenticated %}
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Add Comment</button>
+  </form>
+{% else %}
+  <p><a href="{% url 'login' %}">Log in</a> to comment.</p>
+{% endif %}
+
 {% endblock content %}
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('liked') === 'true') {
+      const likeSection = document.getElementById('like');
+      if (likeSection) {
+        likeSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  });
+</script>

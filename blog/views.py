@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
+from .forms import CommentForm
+from .models import Comment
 from django.views.generic import (
     ListView,
     DetailView,
@@ -57,10 +59,30 @@ class UserPostListView(ListView):
         user = get_object_or_404(User, username=self.kwargs.get('username'))
         return Post.objects.filter(author=user).order_by('-date_posted')
 
-
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = self.get_object()
+        context['comments'] = post.comments.all()
+        context['form'] = CommentForm()
+        context['is_liked'] = self.request.user in post.likes.all()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = self.object
+            comment.author = request.user
+            comment.save()
+            return redirect(f"{self.request.path}#comments")
+        context = self.get_context_data()
+        context['form'] = form
+        return self.render_to_response(context)
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -103,3 +125,25 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 def about(request):
     return render(request, 'blog/about.html', {'title': 'About'})
+
+from django.shortcuts import redirect
+
+def like_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.user.is_authenticated:
+        if request.user in post.likes.all():
+            post.likes.remove(request.user)
+        else:
+            post.likes.add(request.user)
+    return redirect(f"/post/{pk}/#like")
+
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+
+@login_required
+@require_POST
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
+    post_pk = comment.post.pk
+    comment.delete()
+    return redirect(f'/post/{pk}/?liked=true')

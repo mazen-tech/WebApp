@@ -4,6 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from .forms import CommentForm
 from .models import Comment
+from django.core.paginator import Paginator
 from django.views.generic import (
     ListView,
     DetailView,
@@ -19,21 +20,28 @@ from django.contrib.staticfiles.views import serve
 from django.db.models import Q
 
 
-def home(request):
-    context = {
-        'posts': Post.objects.all()
-    }
-    return render(request, 'blog/home.html', context)
-
 def search(request):
-    template='blog/home.html'
+    template = 'blog/home.html'
 
-    query=request.GET.get('q')
+    query = request.GET.get('q')
 
-    result=Post.objects.filter(Q(title__icontains=query) | Q(author__username__icontains=query) | Q(content__icontains=query))
-    paginate_by=2
-    context={ 'posts':result }
-    return render(request,template,context)
+    result = Post.objects.filter(
+        Q(title__icontains=query) | 
+        Q(author__username__icontains=query) | 
+        Q(content__icontains=query)
+    ).order_by('-date_posted')   
+
+
+    paginator = Paginator(result, 2)  
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'posts': page_obj.object_list,  # current page's posts
+        'page_obj': page_obj,           # required for pagination controls in template
+        'is_paginated': page_obj.has_other_pages(),  # to enable pagination buttons
+    }
+    return render(request, template, context)
    
 
 
